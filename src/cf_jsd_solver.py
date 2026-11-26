@@ -1,12 +1,12 @@
 """t5 前置：JSD 求解 → cf_clearance 写回引擎 jar 的模块
 用法（在 t5-harden.py 的 reauth 前调用）：
-  from build.cf_jsd_solver import solve_jsd
+  from cf_jsd_solver import solve_jsd
   clearance_cookies = solve_jsd(eng)   # 返回 {'cf_clearance': ..., '__cf_bm': ...}
   for k, v in clearance_cookies.items():
       eng.jar._d[("auth.openai.com", k)] = (v, "")
 """
 import sys, os, re, pathlib, subprocess, random, string, json, time
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 BUILD = pathlib.Path(__file__).resolve().parent
 NODE = os.path.expandvars(r"%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe")
@@ -82,7 +82,7 @@ def solve_jsd(eng, timeout_s=12):
 
 
 if __name__ == "__main__":
-    from build.live_engine import LiveEngine, proxy_url
+    from live_engine import LiveEngine, proxy_url
     sid = "Jsdbg" + "".join(random.choices("abcdefghjkmnpqrstuvwxyz23456789", k=8))
     eng = LiveEngine(proxy=proxy_url("US", sid, host_tpl="<PROXY_HOST>"))
     ck = solve_jsd(eng)

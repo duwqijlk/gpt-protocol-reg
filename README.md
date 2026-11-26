@@ -28,7 +28,7 @@ sentinel/dx 反爬令牌合成均以纯协议实现。
 
 ```bash
 # 1) 依赖
-pip install curl_cffi pyotp
+pip install -r requirements.txt
 
 # 2) 配置
 cp config.example.json config.json   # 填你的代理 / OTP hook

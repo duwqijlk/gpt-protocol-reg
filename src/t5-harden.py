@@ -8,13 +8,13 @@
 #   → CSV(含 password/totp_secret 新列) + tokens/<email>.json 双落档
 import sys, os, json, time, re, pathlib, random, csv as _csv, hmac, hashlib, base64 as _b64, struct
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from build.live_engine import LiveEngine, proxy_url, navigation_headers, fetch_headers
-from build.params.known import (pkce_verifier, pkce_challenge_s256, new_oauth_state,
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from live_engine import LiveEngine, proxy_url, navigation_headers, fetch_headers
+from params.known import (pkce_verifier, pkce_challenge_s256, new_oauth_state,
                                 new_logging_id, new_oai_did, build_sentinel_headers,
                                 sentinel_error_fallback)
-from build.params.env25 import fake_config25, region_config, REGION_PRESETS
-from build.sentinel import requirements_token, solve_proofofwork, generate_t, generate_so
+from params.env25 import fake_config25, region_config, REGION_PRESETS
+from sentinel import requirements_token, solve_proofofwork, generate_t, generate_so
 from types import SimpleNamespace
 import uuid as _uuid
 
@@ -239,7 +239,7 @@ log(f"[T5.0] authorize_url: {authorize_url[:120]}")
 # 修复：登录 authorize 也走 Node 转发（JSD 解在前保证 cf_clearance + 同指纹）
 h = dict(BASE, **navigation_headers(for_url=authorize_url, init_url="https://chatgpt.com/", referer="https://chatgpt.com/"))
 try:
-    from build.node_forwarder import NodeForwarder
+    from node_forwarder import NodeForwarder
     _fwd = NodeForwarder()
     # 引擎 cookie 同步
     for (tl, n), (v, _rw) in eng.jar._d.items():
@@ -328,7 +328,7 @@ def try_reauth_password():
     # → authorize(max_age=0) → 无 MFA 账号直接落 reset-password 页
     # ===== JSD 求解前置：CF 挑战 → cf_clearance 写回 jar（纯协议破解成果）=====
     try:
-        from build.cf_jsd_solver import solve_jsd
+        from cf_jsd_solver import solve_jsd
         _ck = solve_jsd(eng, timeout_s=10)
         log(f"[T5.5j] JSD 解: {json.dumps({k: v[:20] + '…' for k, v in _ck.items()}, ensure_ascii=False)}")
         for _nm, _vl in _ck.items():
@@ -409,7 +409,7 @@ def try_reauth_password():
             pass
         # === Node 转发层：reauth authorize 走 Node fetch（同指纹——CF clearance 绑定验证）===
         try:
-            from build.node_forwarder import NodeForwarder
+            from node_forwarder import NodeForwarder
             _fwd = NodeForwarder()
             # 先把引擎的 cookie 同步到 Node jar
             for (tl, n), (v, _rw) in eng.jar._d.items():

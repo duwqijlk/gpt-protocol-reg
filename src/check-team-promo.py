@@ -8,7 +8,7 @@
 """
 import sys, json, pathlib, random, time
 sys.path.insert(0, r"C:\Users\Administrator\Desktop\GPT新版本协议研究")
-from build.live_engine import LiveEngine, proxy_url
+from live_engine import LiveEngine, proxy_url
 
 P = pathlib.Path(r"C:\Users\Administrator\Desktop\GPT新版本协议研究\build\tokens")
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
