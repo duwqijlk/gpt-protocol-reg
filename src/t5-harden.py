@@ -806,6 +806,27 @@ r11 = eng.post("https://chatgpt.com/backend-api/accounts/mfa/factor_decision",
                json={"entrypoint": "post_totp"}, headers=bh)
 log(f"[T5.10] factor_decision: status={r11.status}")
 
+# ============ T5.11 team-1-month-free 促销资格检测（长链脚本第 3 步同款判定）============
+TEAM_PROMO = ""
+TEAM_PROMO_STATE = ""
+try:
+    h_cc = dict(BASE, Referer="https://chatgpt.com/", Accept="*/*")
+    if ACCESS_TOKEN:
+        h_cc["Authorization"] = "Bearer " + ACCESS_TOKEN
+    r_cc = eng.get("https://chatgpt.com/backend-api/promo_campaign/check_coupon"
+                   "?coupon=team-1-month-free&is_coupon_from_query_param=false", headers=h_cc)
+    t_cc = r_cc.body.decode("utf-8", "replace")
+    try:
+        j_cc = json.loads(t_cc)
+        TEAM_PROMO_STATE = j_cc.get("state", "?")
+        rd = j_cc.get("redemption") or {}
+        rd_str = (f" redeemed_at={rd.get('redeemed_at')}" if rd.get("redeemed_at") else "")
+        log(f"[T5.11] team-1-month-free: state={TEAM_PROMO_STATE}{rd_str}")
+    except Exception:
+        log(f"[T5.11] team-1-month-free: 解析失败 body={t_cc[:120]}")
+except Exception as e:
+    log(f"[T5.11] team-1-month-free 检测异常: {str(e)[:80]}")
+
 # ============ 落档：CSV 新列 + tokens json ============
 st0 = st1 = ""
 try:
@@ -826,7 +847,7 @@ NOTES = (f"password={'✓已设置' if PASSWORD_DONE else '✗reauth-409未落'}
 # 格式规范：与 build/accounts-clean.csv 一致（用户指定的默认导出格式）
 CLEAN_HDR = ["email", "region", "proxy_sid", "gateway", "status", "profile", "exit_ip",
              "password", "totp_secret", "session_token_0", "session_token_1", "access_token",
-             "notes", "last_update", "alive"]
+             "notes", "last_update", "alive", "team_promo"]
 STATUS_RANK = {"failed": 0, "success": 1, "login-success": 2, "mfa-success": 3, "harden-success": 4, "harden-failed": 0}
 CLEAN_PATH = CSV_PATH.with_name("accounts-clean.csv")
 clean_rows = []
@@ -842,7 +863,8 @@ this.update({"email": EMAIL, "region": REGION, "proxy_sid": SID, "gateway": _GAT
              "status": STATUS, "exit_ip": EXIT_IP,
              "password": REC_PASSWORD, "totp_secret": REC_TOTP,
              "session_token_0": st0, "session_token_1": st1, "access_token": ACCESS_TOKEN,
-             "notes": NOTES[:220], "last_update": time.strftime("%Y-%m-%d %H:%M:%S"), "alive": "YES" if ACT_OK else ""})
+             "notes": NOTES[:220], "last_update": time.strftime("%Y-%m-%d %H:%M:%S"),
+             "alive": "YES" if ACT_OK else "", "team_promo": TEAM_PROMO_STATE})
 # upsert：同 email 合并（时间递增 → 非空覆盖旧值；状态取最高）
 merged = {}
 for r in clean_rows:
@@ -890,8 +912,9 @@ prev.update({"email": EMAIL, "region": REGION, "status": STATUS, "password": REC
              "totp_secret": REC_TOTP, "totp_session_id": TOTP_SESSION,
              "mfa_active": ACT_OK, "password_set": PASSWORD_DONE,
              "access_token": ACCESS_TOKEN, "session_token_0": st0, "session_token_1": st1,
+             "team_promo": TEAM_PROMO_STATE,
              "hardened_at": time.strftime("%Y-%m-%d %H:%M:%S")})
 tf.write_text(json.dumps(prev, ensure_ascii=False, indent=1), encoding="utf8")
 log(f"[CSV] {STATUS} 已记录（password{'✓已设置' if PASSWORD_DONE else '✗未落(空列)'} + totp{'✓' if ACT_OK else '✗'}）")
-log(f"[DONE] password={'✓' + REC_PASSWORD if PASSWORD_DONE else '✗reauth-409未设置'} | totp_secret={'✓' + REC_TOTP if REC_TOTP else '✗'}")
+log(f"[DONE] password={'✓' + REC_PASSWORD if PASSWORD_DONE else '✗reauth-409未设置'} | totp_secret={'✓' + REC_TOTP if REC_TOTP else '✗'} | team_promo={TEAM_PROMO_STATE or '?'}")
 pathlib.Path(__file__).with_name("t5-transcript.txt").write_text("\n".join(TRANSCRIPT), encoding="utf8")

@@ -6,13 +6,14 @@
 
 ```csv
 email,region,proxy_sid,gateway,status,profile,exit_ip,password,totp_secret,
-session_token_0,session_token_1,access_token,notes,last_update,alive
+session_token_0,session_token_1,access_token,notes,last_update,alive,team_promo
 ```
 
 - **一行一个账号**（不是追加式流水）
 - 同 email 重跑 → **upsert 合并**：非空字段覆盖旧值、状态取最高（harden-success > mfa-success > login-success > success > failed）、last_update 刷新
 - `password` 列只在 password/add 真正成功（200 + callback）才写入——未生效的生成密码绝不落表
 - `alive` 列由巡检脚本（check-alive-all.py）维护
+- `team_promo` 列由 t5-harden T5.11 步维护（team-1-month-free 促销资格：eligible / not_eligible）
 
 ## 写入方（已全部改造完成）
 

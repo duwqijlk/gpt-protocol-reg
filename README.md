@@ -21,6 +21,7 @@ sentinel/dx 反爬令牌合成均以纯协议实现。
 | MFA 加固 | `src/t5-harden.py` | TOTP enroll + activate + password/add 全协议 |
 | 批量 | `src/batch-register.py` / `batch-harden.py` | 多账号顺序流水（人形节奏） |
 | 巡检 | `src/check-alive-all.py` | access_token → /backend-api/me 三连验活 |
+| 促销资格 | `src/check-team-promo.py` / t5 T5.11 | team-1-month-free 优惠券资格检测（纯协议） |
 | 账号表 | `src/accounts-clean` 格式 | 一行一账号，upsert 合并（见 docs/ACCOUNTS-CSV-SPEC.md） |
 
 ## 快速开始
