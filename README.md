@@ -58,6 +58,12 @@ docs/   技术文档（JSD 破解记录 / 账号表规范 / 抓包规范）
 - **reauth 409 根因**：不是限流，是 authorize 被 CF 指纹拦截后会话作废。登录与 reauth 两个 authorize 都走 Node 转发后全链稳定。
 - **产出格式**：`accounts-clean.csv` 一行一账号 upsert（规范见 docs/）。
 
+## 交流群
+
+有问题、经验分享、羊毛信息交流欢迎进群：
+
+**[AI羊毛交流群](https://t.me/muihbb)** · t.me/muihbb
+
 ## 免责声明
 
 本项目仅用于安全研究与授权测试。使用者需自行遵守目标服务的条款与当地法规。
