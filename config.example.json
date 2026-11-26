@@ -1,0 +1,12 @@
+{
+  "_comment": "复制为 config.json 后填写自己的凭据；所有字段也可用同名环境变量提供",
+  "proxy": {
+    "user": "<PROXY_USER>",
+    "password": "<PROXY_PASSWORD>",
+    "host_us": "<PROXY_HOST_US>",
+    "host_sg": "<PROXY_HOST_SG>"
+  },
+  "otp_hook": "https://<YOUR-OTP-SERVICE>/api/v1/otp?token=<YOUR_TOKEN>",
+  "region_default": "JP",
+  "bitbrowser_api": "http://127.0.0.1:54348"
+}

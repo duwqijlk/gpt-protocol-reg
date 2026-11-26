@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+config.json
+tokens/
+accounts-clean.csv
+registered-accounts.csv
+batch-transcripts/
+token-transcripts/
+*.log
+params/cf-jsd-main*.js
+params/cf-jsd-ship.json
+params/auth-cdn/
